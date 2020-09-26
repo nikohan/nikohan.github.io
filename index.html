@@ -225,7 +225,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2020-09-26 18:56:51 / 修改时间：19:01:54" itemprop="dateCreated datePublished" datetime="2020-09-26T18:56:51+08:00">2020-09-26</time>
+      <time title="创建时间：2020-09-26 18:56:51 / 修改时间：19:24:39" itemprop="dateCreated datePublished" datetime="2020-09-26T18:56:51+08:00">2020-09-26</time>
     </span>
 
   
@@ -244,10 +244,23 @@
 
 <h3 id="3-ssh-连接-wsl"><a href="#3-ssh-连接-wsl" class="headerlink" title="3.ssh 连接 wsl"></a>3.ssh 连接 wsl</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo apt-get remove openssh-server  # 卸载自带的 ssh</span><br><span class="line">&gt; sudo apt-get install openssh-server  # 再次安装</span><br><span class="line">&gt; vi &#x2F;etc&#x2F;ssh&#x2F;sshd_config</span><br><span class="line">添加如下:</span><br><span class="line">	# 默认的是22，但是windows有自己的ssh服务也是22端口</span><br><span class="line">	Port 2222</span><br><span class="line">	# 默认为no 我们使用 ssh秘钥对登录，所以使用默认no</span><br><span class="line">	PasswordAuthentication no </span><br><span class="line">&gt; sudo service ssh --full-restart  # 重启ssh服务</span><br><span class="line">&gt; sudo -i  #可直接进入 root用户</span><br><span class="line">&gt; ssh-keygen #生成 ssh秘钥和公钥 一路回车</span><br><span class="line">&gt; sudo cp &#x2F;mnt&#x2F;c&#x2F;Users&#x2F;用户名&#x2F;.ssh&#x2F;id_rsa.pub &#x2F;root&#x2F;.ssh&#x2F;authorized_keys</span><br></pre></td></tr></table></figure>
 
-<h3 id="4-ssh客户端连接wsl"><a href="#4-ssh客户端连接wsl" class="headerlink" title="4.ssh客户端连接wsl"></a>4.ssh客户端连接wsl</h3><p>可以使用git-bash</p>
+<h3 id="4-ssh客户端连接wsl"><a href="#4-ssh客户端连接wsl" class="headerlink" title="4.ssh客户端连接wsl"></a>4.ssh客户端连接wsl</h3><p>在windows可以使用git-bash</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh 用户名@127.0.0.1 -p 2222</span><br></pre></td></tr></table></figure>
 
+<h3 id="5-设置开机自启动-wsl-的-sshd-服务"><a href="#5-设置开机自启动-wsl-的-sshd-服务" class="headerlink" title="5.设置开机自启动 wsl 的 sshd 服务"></a>5.设置开机自启动 wsl 的 sshd 服务</h3><p>在 wsl 中编辑 脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo vim &#x2F;etc&#x2F;init.wsl</span><br></pre></td></tr></table></figure>
 
+<p>添加内容如下：(ssh 服务，$1 表示 命令后的第一个参数 {start-stop-restart})</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">&#x2F;etc&#x2F;init.d&#x2F;ssh $1</span><br></pre></td></tr></table></figure>
+
+<p>更改权限：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo chmod 774 &#x2F;etc&#x2F;init.wsl</span><br></pre></td></tr></table></figure>
+
+<p>在 windows 中:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">win+r -&gt; shell:startup</span><br></pre></td></tr></table></figure>
+
+<p>在自启动目录下创建并编辑脚本：ubuntu2004.vbs<br>添加内容如下：(表示创建一个 cmd窗口的对象 ws，以wsl 命令来启动 wsl中的 /etc/init.wsl 脚本)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Set ws &#x3D; CreateObject(&quot;Wscript.Shell&quot;)</span><br><span class="line">ws.run &quot;wsl -d Ubuntu-20.04 -u root &#x2F;etc&#x2F;init.wsl start&quot;, vbhide</span><br></pre></td></tr></table></figure>
 
 <p>参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jinlun1230/p/13191578.html">https://www.cnblogs.com/jinlun1230/p/13191578.html</a></p>
 
